@@ -2,6 +2,10 @@
 
 API REST para gestionar una agencia de viajes: sucursales, destinos, hoteles, vuelos, paquetes turísticos, usuarios, turistas y reservas.
 
+> 📌 **Trabajo práctico grupal de Programación 2 (UTN).**
+> Este backend fue desarrollado por [Raamaa31-cpu](https://github.com/Raamaa31-cpu) ([repositorio original](https://github.com/Raamaa31-cpu/Columbia_Viajes_Backend)); esta copia se conserva como registro del proyecto.
+> Mi parte fue el **frontend en Vaadin**: 👉 [gvarone/Columbia_Viajes_Frontend](https://github.com/gvarone/Columbia_Viajes_Frontend)
+
 Proyecto de aprendizaje en desarrollo, con autenticación mediante JWT, permisos por rol y restricciones de reservas por sucursal. La aplicación es un único módulo de Spring Boot; este repositorio contiene el backend.
 
 ## 🧰 Tecnologías
