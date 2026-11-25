@@ -64,15 +64,27 @@ Hibernate usa `ddl-auto=validate`: comprueba que las tablas coincidan con las en
 
 ### 3. Configurar la conexión y el secreto JWT
 
-La configuración está en [application.properties](src/main/resources/application.properties). Podés reemplazar la conexión y sus credenciales mediante variables de entorno de Spring Boot:
+[application.properties](src/main/resources/application.properties) no contiene credenciales: las lee de un archivo `.env` en la raíz del proyecto (cargado con `spring.config.import`) o de variables de entorno. `.env` está en `.gitignore` y nunca se sube al repositorio.
 
-```powershell
-$env:SPRING_DATASOURCE_URL = "jdbc:mysql://localhost:3307/columbia_viajes"
-$env:SPRING_DATASOURCE_USERNAME = "tu_usuario_mysql"
-$env:SPRING_DATASOURCE_PASSWORD = "tu_clave_mysql"
-```
+1. Copiá la plantilla:
 
-`JWT_SECRET` es obligatorio: debe contener una clave aleatoria codificada en Base64, de al menos 32 bytes antes de codificarla. Para generar una en PowerShell, compatible con Windows PowerShell 5.1:
+   ```bash
+   cp .env.example .env            # Linux/macOS
+   Copy-Item .env.example .env     # PowerShell
+   ```
+
+2. Completá tus valores en `.env`:
+
+   | Variable | Obligatoria | Valor por defecto |
+   | --- | --- | --- |
+   | `DB_URL` | No | `jdbc:mysql://localhost:3307/columbia_viajes` |
+   | `DB_USERNAME` | No | `root` |
+   | `DB_PASSWORD` | Sí | — |
+   | `JWT_SECRET` | Sí | — |
+
+Las variables de entorno tienen prioridad sobre `.env`, así que también podés definirlas en la terminal, en el IDE o en un servidor sin usar el archivo. El `.env` se busca en el directorio desde el que se inicia la aplicación: ejecutala desde la raíz del proyecto.
+
+`JWT_SECRET` debe contener una clave aleatoria codificada en Base64, de al menos 32 bytes antes de codificarla. En Linux/macOS: `openssl rand -base64 32`. En PowerShell, compatible con Windows PowerShell 5.1:
 
 ```powershell
 $jwtBytes = New-Object byte[] 32
@@ -82,34 +94,32 @@ try {
 } finally {
     $jwtGenerator.Dispose()
 }
-$env:JWT_SECRET = [Convert]::ToBase64String($jwtBytes)
+[Convert]::ToBase64String($jwtBytes)
 ```
 
-Estas variables quedan disponibles en la terminal actual y en los procesos que inicies desde ella. Usá un secreto estable si querés conservar la validez de los tokens entre reinicios: generar otro secreto invalida los JWT firmados con el anterior. Mantené las claves reales fuera del repositorio.
+Pegá el resultado en `JWT_SECRET` dentro de `.env`. Usá un secreto estable si querés conservar la validez de los tokens entre reinicios: generar otro secreto invalida los JWT firmados con el anterior.
 
 | Configuración | Valor por defecto / requisito |
 | --- | --- |
 | Base de datos | `jdbc:mysql://localhost:3307/columbia_viajes` |
 | Esquema JPA | `validate` |
-| Secreto JWT | Variable de entorno `JWT_SECRET` |
+| Credenciales y secreto JWT | `.env` o variables de entorno |
 | Duración del JWT | `900000` ms: 15 minutos |
 | URL de la API | `http://localhost:8080` |
 
 ### 4. Iniciar la aplicación
 
-En la misma terminal de PowerShell:
+Desde la raíz del proyecto, con el `.env` completo:
 
 ```powershell
-.\mvnw.cmd spring-boot:run
+.\mvnw.cmd spring-boot:run      # Windows
 ```
-
-En Linux o macOS, configurá las variables de entorno en tu shell y ejecutá:
 
 ```bash
-./mvnw spring-boot:run
+./mvnw spring-boot:run          # Linux/macOS
 ```
 
-La API queda disponible en `http://localhost:8080`. Si ejecutás desde un IDE, configurá también `JWT_SECRET` y las credenciales de MySQL en el entorno del proceso que inicia la aplicación.
+La API queda disponible en `http://localhost:8080`. Si ejecutás desde un IDE, verificá que el directorio de trabajo sea la raíz del proyecto para que encuentre el `.env`.
 
 ## 🔐 Autenticación
 
